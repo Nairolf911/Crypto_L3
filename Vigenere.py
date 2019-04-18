@@ -12,7 +12,6 @@ def code_vigenere(cle,message) :
     """ Fonction qui permet de décoder le code de vigenère en connaissant la clé
     Elle prend en argument la clé sous forme de tableau et le nom du fichier (message.txt par exemple), et retourne le message décodé"""
     contenu = lire_message(message)
-    print(cle)
     decrypted = ""
     compteur = 0
     try:
@@ -24,23 +23,22 @@ def code_vigenere(cle,message) :
                 compteur=0
             decrypted += decalage_new_lettre
     except:
-        print("Problème avec la clé, veuillez en essayer une autre !")
-        return
+        return None
     return decrypted
 #code_vigenere([2,9,3])
 #rint(code_vigenere([7,2,9,3,1,3,5,11,10,4,3],"message6.txt"))
 
 def pgcd(a,b):
-    """ Fonction du plus grand diviseur commun entre les 2 arguments"""
+    """ Fonction du plus grand diviseur commun entre 2 arguments"""
     if b==0:
         return a
     else:
         r=a%b
         return pgcd(b,r)
 
-def Longeur_cle_vigenere(message):
+def Longueur_cle_vigenere(message,precision):
     """ Fonction qui permet de déterminer la longueur de la clé de vigenère en utilisant la distance entre chaque élement et le PGCD
-    Elle prend en argument le nom du fichier et retourne les 5 longueurs de clé les plus probables"""
+    Elle prend en argument le nom du fichier et la précision : il s'agit de retourner les n possibilité de longueur de clé """
     contenu = lire_message(message)
     dico = {}
     for i in range (0, len(contenu)-2) :
@@ -63,11 +61,12 @@ def Longeur_cle_vigenere(message):
                 else: #sinon, on récupère sa valeur et on l'incrémente
                     compteur = distance.get(a)
                     distance[a] = compteur+1
-    dico_trie = sorted(distance.items(), reverse=True, key=operator.itemgetter(1)) # On trie dans le sens décroissant 
-    print("Voici les 4 longueurs les plus probables :")
-    for i in range(1,5):
-        print("Clé",i,":",dico_trie[i])
-#Longeur_cle_vigenere("message6.txt")
+    dico_trie = sorted(distance.items(), reverse=True, key=operator.itemgetter(1)) # On trie dans le sens décroissant
+    selection =[]
+    for i in range(0,precision):
+        selection.append(dico_trie[i] [0])
+    return selection
+#print(Longueur_cle_vigenere("message6.txt",5))
 
 def Determine_cle_vigenere(message,longueur):
     """ Fonction qui permet de déterminer les différentes clé de vigenere, 
@@ -75,7 +74,7 @@ def Determine_cle_vigenere(message,longueur):
     elle renvoit différentes possibilités de clé"""
     contenu = lire_message(message)
     compteur=0
-    dico=[{}for i in range(longueur)] #On créer un dictionnaire de n dictionnaire (avec n la longueur de la clé)
+    dico=[{}for i in range(longueur)] #On créer une liste de n dictionnaire (avec n la longueur de la clé)
 
     ### Dans la partie suivante, on va faire une analyse de fréquence sur CHACUN des éléments en faisant intervernir la longueur de la clé
     ### exemple sur un vigenere de longueur 3, texte = abcdefabc , en faisant l'analyse de fréquence, 
@@ -93,13 +92,11 @@ def Determine_cle_vigenere(message,longueur):
             compteur=0
     lettre_plus_frequente =[]
     decalage_1 = [] # On créer une première liste pour le décalage avec l'espace
-    decalage_2 = [] # On créer une deuxième liste pour le décalage avec le e
     for n in range(longueur):
         dico_trie = sorted(dico[n].items(), reverse=True, key=operator.itemgetter(1)) # Permet de sortir le n-ième dictionnaire sous forme de liste
         lettre_plus_frequente.append(dico_trie[0])
         decalage_1.append(ord(lettre_plus_frequente[n][0]) - ord(" "))
-        decalage_2.append(ord(lettre_plus_frequente[n][0]) - ord("e"))
-    return decalage_1,decalage_2
+    return decalage_1
 #Determine_cle_vigenere("message6.txt",11)
 #Determine_cle_vigenere("message4.txt",2)
 
@@ -109,17 +106,18 @@ def interface_utilisateur(message):
     """ Fonction qui permet l'interface avec l'utilisateur
     Elle prend en argument le nom du message, par exemple message.txt
     Elle décrypte le message, et donne les différentes clés et décryptage possible"""
-
-    print("\n ########## Bienvenue dans le décodeur du code de vigenère ########## \n")
-    Longeur_cle_vigenere(message)
-    longueur = int(input("Veuilez rentrer une longueur :"))
-    print("\n Voici les 2 clés possible",Determine_cle_vigenere(message,longueur))
-    cle = input("Veuilez rentrer une cle (sous la forme x,x,x) :")
-    cle_separer = cle.split(",")
-    print(code_vigenere(cle_separer,str(message)))
-    recommencer = str(input("Souhaitez vous recommencer ? (O pour oui et N pour non)"))
-    if (recommencer == "O" or recommencer=="o"):
-        interface_utilisateur(message)
-
+    print("\n###########################################################################")
+    print("########## Bienvenue dans le décodeur du code de vigenère #################")
+    print("###########################################################################\n")
+    precision = int(input("Quelle précision voulez vous pour le décodage ? (5 est suffisant dans 99% des cas) :"))
+    liste_longueur = Longueur_cle_vigenere(message,precision)
+    for longueur in liste_longueur:
+        a = Determine_cle_vigenere(message,longueur)
+        if (code_vigenere(a,message) != None):
+            print(code_vigenere(a,message))
+            print("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+            print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+            print("\nDécryptage obtenu pour une longueur de :",longueur,"et une clé de",a)
+            print("\n")
 interface_utilisateur("message6.txt")
 ############################################

@@ -28,7 +28,7 @@ def caractere_plus_frequent(texte,n):
         return
 #caractere_plus_frequent(lire_message("message3.txt"),5000)
 def decryptage_cesar(decalage,message):
-    """ Fonction qui permet de décrypter le chiffre de césar (à 1 clé) en connaissance la cle
+    """ Fonction qui permet de décrypter le chiffre de césar (à 1 clé) en connaissant la cle
     Elle prend 2 arguments : la clé de cryptage, et le message à decrypter
     Elle retourne le message décodé"""
     contenu = lire_message(message)
@@ -95,7 +95,7 @@ def interface_utilisateur(message):
     cle = deviner_cle_cesar(message) # Permet de donner l'éventualité des clés
     for key in cle:
         print(decryptage_cesar(key,message))
-    print("La/les clé(s) correspond(antes) à(sont) :",cle)
+    print("La/les clé(s) possible(s) est(sont) :",cle)
 
-interface_utilisateur("message4.txt")
+interface_utilisateur("message3.txt")
 ############################################

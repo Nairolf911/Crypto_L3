@@ -26,5 +26,4 @@ def decryptage_scytale(cle,message):
             colonne = 0
             ligne += 1    
     print(''.join(Message_au_clair) + "\n")
-        
 decryptage_scytale(3,"Message.txt")
